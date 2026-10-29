@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Web Car Service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+
+    <div class="bg-white w-full max-w-2xl rounded-lg shadow-md p-8 border-t-4 border-blue-600">
+        
+        <div class="flex items-center justify-between border-b pb-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Agenda Web Car Service</h1>
+                <p class="text-sm text-gray-500">Sistema de Gestión de Citas de Taller</p>
+            </div>
+            <!-- Logotipo de la empresa -->
+            <div class="bg-blue-600 text-white font-bold px-4 py-2 rounded text-sm">
+                CS
+            </div>
+        </div>
+
+        <!-- Formulario de una sola vista -->
+        <form id="citaForm" class="space-y-4">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nombres de Contacto</label>
+                    <input type="text" id="nombres" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Apellidos de Contacto</label>
+                    <input type="text" id="apellidos" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Teléfono (8 dígitos)</label>
+                    <input type="text" id="telefono" maxlength="8" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                    <input type="email" id="correo" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Placa del Vehículo</label>
+                    <input type="text" id="placa" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Agencia Seleccionada</label>
+                    <select id="idAgencia" class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="1">Agencia Zona 9 - Central</option>
+                        <option value="2">Agencia Carretera a El Salvador</option>
+                        <option value="3">Agencia Majadas Zona 11</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Tipo de Servicio</label>
+                <input type="text" id="tipoServicio" placeholder="Ej. Mantenimiento Preventivo 5,000 km" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Fecha de Cita</label>
+                    <input type="date" id="fecha" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Hora</label>
+                    <input type="time" id="hora" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Kilometraje</label>
+                    <input type="number" id="kilometraje" required class="mt-1 w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white font-bold p-3 rounded hover:bg-blue-700 transition duration-200 mt-4">
+                Registrar Cita
+            </button>
+        </form>
+
+        <div id="mensajeAlerta" class="mt-4 text-center font-semibold text-sm"></div>
+    </div>
+
+    <!-- Script de conexión al Backend -->
+    <script>
+        document.getElementById('citaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const datos = {
+                nombres: document.getElementById('nombres').value,
+                apellidos: document.getElementById('apellidos').value,
+                telefono: document.getElementById('telefono').value,
+                correo: document.getElementById('correo').value,
+                placa: document.getElementById('placa').value,
+                idAgencia: parseInt(document.getElementById('idAgencia').value),
+                tipoServicio: document.getElementById('tipoServicio').value,
+                fecha: document.getElementById('fecha').value,
+                hora: document.getElementById('hora').value,
+                kilometraje: parseInt(document.getElementById('kilometraje').value)
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/citas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+
+                const resultado = await response.json();
+                const alerta = document.getElementById('mensajeAlerta');
+
+                if (resultado.exito) {
+                    alerta.className = "mt-4 text-center font-semibold text-sm text-green-600";
+                    alerta.textContent = resultado.mensaje;
+                    document.getElementById('citaForm').reset();
+                } else {
+                    alerta.className = "mt-4 text-center font-semibold text-sm text-red-600";
+                    alerta.textContent = "Error: " + resultado.error;
+                }
+            } catch (error) {
+                console.error("Error de red:", error);
+                const alerta = document.getElementById('mensajeAlerta');
+                alerta.className = "mt-4 text-center font-semibold text-sm text-red-600";
+                alerta.textContent = "Error de conexión con el servidor backend en el puerto 3000.";
+            }
+        });
+    </script>
+</body>
+</html>
